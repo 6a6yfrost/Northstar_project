@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{{ config.app_name }}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="chat-header">
+            <div class="header-content">
+                <div class="logo-section">
+                    <i class="fas fa-store logo-icon"></i>
+                    <div>
+                        <h1>{{ config.app_name }}</h1>
+                        <span class="version">v{{ config.version }}</span>
+                    </div>
+                </div>
+                <div class="header-actions">
+                    <span class="status-badge">
+                        <span class="status-dot"></span>
+                        Online
+                    </span>
+                    <button class="icon-btn" id="analyticsBtn" title="View Analytics">
+                        <i class="fas fa-chart-bar"></i>
+                    </button>
+                    <button class="icon-btn" id="readinessBtn" title="Go-Live Readiness">
+                        <i class="fas fa-clipboard-check"></i>
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-bolt"></i> Quick Actions</h3>
+                    {% for reply in config.quick_replies %}
+                    <button class="quick-action-btn" data-query="{{ reply.text }}">
+                        {{ reply.label }}
+                    </button>
+                    {% endfor %}
+                </div>
+                
+                <div class="sidebar-section">
+                    <h3><i class="fas fa-info-circle"></i> Tips</h3>
+                    <div class="tip-item">
+                        <i class="fas fa-hashtag"></i>
+                        <span>Use order numbers like ORD-2024-001</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-box-open"></i>
+                        <span>Ask about specific products by name</span>
+                    </div>
+                    <div class="tip-item">
+                        <i class="fas fa-clock"></i>
+                        <span>Refunds take 5-10 business days</span>
+                    </div>
+                </div>
+            </aside>
+
+            <!-- Chat Area -->
+            <div class="chat-area">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Welcome message -->
+                    <div class="message bot">
+                        <div class="message-bubble">
+                            <h3>👋 Welcome to Northstar Support!</h3>
+                            <p>I can help you with:</p>
+                            <ul>
+                                <li>📦 <strong>Order Status</strong> - Track your orders</li>
+                                <li>🔄 <strong>Returns & Refunds</strong> - Return items, check refund status</li>
+                                <li>📊 <strong>Stock Availability</strong> - Check if products are in stock</li>
+                            </ul>
+                            <p class="mt-2">Try asking me something!</p>
+                        </div>
+                        <span class="timestamp">Assistant • Just now</span>
+                    </div>
+                </div>
+
+                <!-- Typing indicator -->
+                <div class="typing-indicator" id="typingIndicator">
+                    <div class="typing-dots">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                    <span>Assistant is typing...</span>
+                </div>
+
+                <!-- Input area -->
+                <div class="input-area">
+                    <div class="input-wrapper">
+                        <textarea 
+                            id="messageInput" 
+                            placeholder="Type your message here..."
+                            rows="1"
+                            maxlength="{{ config.max_message_length }}"
+                        ></textarea>
+                        <button id="sendBtn" class="send-btn">
+                            <i class="fas fa-paper-plane"></i>
+                            Send
+                        </button>
+                    </div>
+                    <div class="input-footer">
+                        <span class="char-count"><span id="charCount">0</span>/{{ config.max_message_length }}</span>
+                        <span class="input-hint">Press Enter to send, Shift+Enter for new line</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modals -->
+    <div class="modal" id="analyticsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-chart-bar"></i> Deflection Analytics</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="analyticsContent">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <div class="modal" id="readinessModal">
+        <div class="modal-content modal-large">
+            <div class="modal-header">
+                <h2><i class="fas fa-clipboard-check"></i> Go-Live Readiness</h2>
+                <button class="modal-close">&times;</button>
+            </div>
+            <div class="modal-body" id="readinessContent">
+                <!-- Populated by JavaScript -->
+            </div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>

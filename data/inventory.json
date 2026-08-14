@@ -1,0 +1,82 @@
+{
+  "Wireless Headphones": {
+    "available": true,
+    "stock": 45,
+    "sizes": [
+      "Standard"
+    ],
+    "colors": [
+      "Black",
+      "White",
+      "Blue"
+    ],
+    "back_in_stock_date": null
+  },
+  "Phone Case": {
+    "available": true,
+    "stock": 120,
+    "sizes": [
+      "Small",
+      "Medium",
+      "Large"
+    ],
+    "colors": [
+      "Black",
+      "Clear",
+      "Red",
+      "Blue"
+    ],
+    "back_in_stock_date": null
+  },
+  "Smart Watch": {
+    "available": false,
+    "stock": 0,
+    "sizes": [
+      "Small",
+      "Medium",
+      "Large"
+    ],
+    "colors": [
+      "Black",
+      "Silver",
+      "Gold"
+    ],
+    "back_in_stock_date": "2024-12-25"
+  },
+  "Laptop Stand": {
+    "available": true,
+    "stock": 30,
+    "sizes": [
+      "Standard"
+    ],
+    "colors": [
+      "Silver",
+      "Black"
+    ],
+    "back_in_stock_date": null
+  },
+  "USB-C Hub": {
+    "available": false,
+    "stock": 0,
+    "sizes": [
+      "Standard"
+    ],
+    "colors": [
+      "Gray"
+    ],
+    "back_in_stock_date": "2024-12-30"
+  },
+  "Gaming Mouse": {
+    "available": true,
+    "stock": 15,
+    "sizes": [
+      "Standard"
+    ],
+    "colors": [
+      "Black",
+      "White",
+      "Red"
+    ],
+    "back_in_stock_date": null
+  }
+}
