@@ -11,10 +11,13 @@ class NorthstarSupportBot:
     """
     
     def __init__(self, data_dir="data"):
-        self.data_dir = data_dir
-        self.orders = self._load_orders()
-        self.inventory = self._load_inventory()
-        self.conversation_history = []
+    self.data_dir = data_dir
+
+    self._ensure_data_dirs()
+
+    self.orders = self._load_orders()
+    self.inventory = self._load_inventory()
+    self.conversation_history = []
         self.current_intent = None
         self.collected_data = {}
         self.tickets_deflected = {
