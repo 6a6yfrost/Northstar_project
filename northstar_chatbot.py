@@ -183,7 +183,11 @@ class NorthstarSupportBot:
             "order_status": [
                 "where is my order", "order status", "has this shipped",
                 "shipping", "delivery", "track order", "tracking number",
-                "when will i get", "order progress", "shipment"
+                "when will i get", "order progress", "shipment", "check my order",
+                "check the order", "i want to check my order", "i want my order",
+                "track my order", "track my shipment", "my order status",
+                "where is my shipment", "status of my order", "order update",
+                "check order status", "want to check my order"
             ],
             "returns_refunds": [
                 "how do i return", "return policy", "return this item",
@@ -201,10 +205,20 @@ class NorthstarSupportBot:
         for intent, patterns in intent_patterns.items():
             matches = sum(1 for pattern in patterns if pattern in user_input)
             scores[intent] = matches / len(patterns)
+
+        order_keywords = ["order", "shipment", "delivery", "tracking"]
+        order_action_words = ["check", "track", "status", "where", "arrive", "deliver", "ship"]
+        has_order_context = any(keyword in user_input for keyword in order_keywords)
+        has_order_action = any(word in user_input for word in order_action_words)
+        if has_order_context and has_order_action:
+            scores["order_status"] = max(scores.get("order_status", 0), 0.35)
         
         best_intent = max(scores, key=scores.get)
         confidence = scores[best_intent]
         
+        if self.extract_order_number(user_input):
+            return "order_status", 0.9
+
         if confidence < 0.1:
             return "general", 0.3
         
@@ -324,31 +338,51 @@ class NorthstarSupportBot:
         """Handle stock availability queries"""
         self.tickets_deflected["stock_availability"] += 1
         self.tickets_deflected["total"] += 1
-        
+
         product = self.extract_product_name(user_input)
-        
+
         response = "📦 **Stock Availability:**\n\n"
-        
+
         if not product:
             response += "Which product are you looking for? I can check availability for:\n"
             for p in sorted(self.inventory.keys()):
                 status = "✓ In Stock" if self.inventory[p]['available'] else "✗ Out of Stock"
                 response += f"• {p}: {status}\n"
             return response
-        
+
         inventory_info = self.inventory.get(product)
         if not inventory_info:
             response += f"Sorry, we don't carry '{product}'. Please check our website for alternatives."
             return response
-        
+
+        base_prices = {
+            "Wireless Headphones": 79.99,
+            "Phone Case": 19.99,
+            "Smart Watch": 199.99,
+            "Laptop Stand": 49.99,
+            "USB-C Hub": 39.99,
+            "Gaming Mouse": 59.99
+        }
+        base_price = base_prices.get(product, 49.99)
+
         if inventory_info['available']:
             response += f"✅ **{product}** is currently in stock!\n"
             response += f"• Stock Quantity: {inventory_info['stock']} units available\n"
             if inventory_info['sizes']:
                 response += f"• Available Sizes: {', '.join(inventory_info['sizes'])}\n"
+
             if inventory_info['colors']:
-                response += f"• Available Colors: {', '.join(inventory_info['colors'])}\n"
-            response += f"\n🛒 Ready to purchase! Add to cart and check out."
+                variants = []
+                for index, color in enumerate(inventory_info['colors']):
+                    price = round(base_price + (index * 7.5), 2)
+                    variants.append({"color": color, "price": price})
+                variants.sort(key=lambda item: item["price"])
+
+                response += "• Available Variations (sorted by price):\n"
+                for variant in variants:
+                    response += f"  - {variant['color']}: ${variant['price']:.2f}\n"
+
+            response += "\n🛒 Ready to purchase! Add to cart and check out."
         else:
             response += f"❌ **{product}** is currently out of stock.\n"
             if inventory_info['back_in_stock_date']:
@@ -356,13 +390,13 @@ class NorthstarSupportBot:
                 response += "\n💡 You can sign up for restock alerts on our website to be notified when this item returns!"
             else:
                 response += "\n💡 We're working on restocking this item. Please check back later or browse similar items."
-            
+
             alternatives = [p for p in self.inventory.keys() if p != product and self.inventory[p]['available']]
             if alternatives:
                 response += f"\n\n🔄 Alternative products currently in stock:\n"
                 for alt in alternatives[:3]:
                     response += f"• {alt}\n"
-        
+
         return response
     
     def handle_general(self, user_input: str) -> str:
@@ -385,7 +419,14 @@ class NorthstarSupportBot:
         
         intent, confidence = self.classify_intent(user_input)
         self.current_intent = intent
-        
+
+        if intent == "general":
+            if self.extract_order_number(user_input) or (
+                any(keyword in user_input for keyword in ["order", "shipment", "delivery", "tracking"]) and
+                any(action in user_input for action in ["check", "track", "status", "where", "arrive", "deliver", "ship", "want"])
+            ):
+                intent = "order_status"
+
         if intent == "order_status":
             response = self.handle_order_status(user_input)
         elif intent == "returns_refunds":
